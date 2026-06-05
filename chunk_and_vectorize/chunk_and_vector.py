@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 
 from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from document_loader.load_documents import load
@@ -15,16 +14,14 @@ DEFAULT_KB_PATH = str(PROJECT_ROOT / "knowledge-base" / "**" / "*.md")
 DB_NAME = "vector_db"
 
 
-def chunk_knowledge_base(knowledge_base: str):
+def chunk_knowledge_base():
     """
-    Divides the provided knowledge base into smaller chunks for easier processing and analysis.
+    Divides the knowledge base into smaller chunks for easier processing and analysis.
 
     The function processes text documents by splitting them into manageable segments using
     the RecursiveCharacterTextSplitter. The resulting chunks are sub-parts of the original
     documents, ensuring overlaps to maintain context between chunks.
 
-    :param knowledge_base: The path or name of the knowledge base to be processed.
-    :type knowledge_base: str
     :return: A list of document chunks derived from the knowledge base.
     :rtype: list
     """
@@ -32,10 +29,7 @@ def chunk_knowledge_base(knowledge_base: str):
     folders = glob.glob(str(kb_folder / "*"))
     documents = load(folders)
 
-    # Divide into chunks using the RecursiveCharacterTextSplitter
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    # returns the chunks
-    print(text_splitter.split_documents(documents)[0].page_content[0:100])
     return text_splitter.split_documents(documents)
 
 def vectorize_chunks(chunks, embeddings):
@@ -49,8 +43,6 @@ def vectorize_chunks(chunks, embeddings):
     :return: Vectorized representation of the document chunks.
     :rtype: Chroma
     """
-    print(f"Vectorizing {len(chunks)} chunks with {embeddings}...")
-
     if os.path.exists(DB_NAME):
         Chroma(
             persist_directory=DB_NAME,

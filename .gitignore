@@ -15,3 +15,6 @@ env/
 
 # Environment variables and secrets
 .env
+
+# Vector database (rebuilt at runtime)
+vector_db/
