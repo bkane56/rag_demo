@@ -5,6 +5,7 @@ __pycache__/
 
 # PyCharm project-specific files
 .idea/
+.junie/
 
 # Python virtual environments
 .venv/
