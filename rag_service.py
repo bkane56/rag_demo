@@ -176,6 +176,35 @@ def get_chunk_info(chunks: list[Document] | None, index: int) -> str:
     )
 
 
+def get_embedding_dimensions(vectorstore) -> int | None:
+    if vectorstore is None:
+        return None
+
+    collection = vectorstore._collection
+    if collection.count() == 0:
+        return None
+
+    sample_embedding = collection.get(limit=1, include=["embeddings"])["embeddings"][0]
+    return len(sample_embedding)
+
+
+def format_build_status(
+    model_label: str,
+    chunk_count: int,
+    vectorstore,
+    *,
+    prebuilt: bool = False,
+) -> str:
+    prefix = "Pre-built vector store" if prebuilt else "Vector store built"
+    dimensions = get_embedding_dimensions(vectorstore)
+    if dimensions is None:
+        return f"{prefix} with **{model_label}** ({chunk_count:,} chunks)."
+    return (
+        f"{prefix} with **{model_label}** "
+        f"({chunk_count:,} chunks, {dimensions:,} dimensions)."
+    )
+
+
 def get_vector_stats(vectorstore) -> str:
     if vectorstore is None:
         return "Build the vector store to view embedding statistics."
@@ -185,8 +214,7 @@ def get_vector_stats(vectorstore) -> str:
     if count == 0:
         return "The vector store is empty."
 
-    sample_embedding = collection.get(limit=1, include=["embeddings"])["embeddings"][0]
-    dimensions = len(sample_embedding)
+    dimensions = get_embedding_dimensions(vectorstore)
     return (
         f"**Vectors:** {count:,}  \n"
         f"**Dimensions:** {dimensions:,}  \n"

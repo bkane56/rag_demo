@@ -9,6 +9,7 @@ from rag_service import (
     format_kb_file_preview,
     get_chunk_choices,
     get_chunk_info,
+    format_build_status,
     get_overview_stats,
     get_plot,
     get_vector_stats,
@@ -152,7 +153,7 @@ def on_build_vector_store(model_label: str, progress=gr.Progress()) -> tuple:
 
     progress(1.0, desc="Complete")
     return (
-        f"Vector store built with **{model_label}** ({len(state.chunks):,} chunks).",
+        format_build_status(model_label, len(state.chunks), state.vectorstore),
         gr.update(choices=chunk_choices, value=first_chunk_index, interactive=True),
         gr.update(maximum=chunk_count, value=first_chunk_index + 1, interactive=True),
         get_vector_stats(state.vectorstore),
@@ -213,8 +214,12 @@ def create_demo(prewarm: bool = True) -> gr.Blocks:
     initial_chunk_count = len(initial_state.chunks) if initial_state.chunks else 1
     initial_plot = get_plot(initial_state.vectorstore, "2D") if initial_state.vectorstore else None
     initial_status = (
-        f"Pre-built vector store with **{DEFAULT_EMBEDDING_MODEL}** "
-        f"({len(initial_state.chunks):,} chunks)."
+        format_build_status(
+            DEFAULT_EMBEDDING_MODEL,
+            len(initial_state.chunks),
+            initial_state.vectorstore,
+            prebuilt=True,
+        )
         if initial_state.vectorstore
         else "Click **Build Vector Store** to chunk documents and create embeddings."
     )

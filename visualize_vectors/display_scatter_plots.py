@@ -7,7 +7,7 @@ DOC_TYPE_COLORS = {
     "products": "#3b82f6",
     "employees": "#22c55e",
     "contracts": "#ef4444",
-    "company": "#f97316",
+    "company": "#8b5cf6",
 }
 
 
